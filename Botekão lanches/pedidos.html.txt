@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!-- Mesmo head do index.html -->
+</head>
+<body>
+    <header class="header">
+        <!-- Mesmo header do index.html -->
+    </header>
+
+    <main class="pedidos-container">
+        <div class="container">
+            <h1 class="section-title">Faça seu Pedido</h1>
+            
+            <div class="pedido-tabs">
+                <button class="tab-btn active" data-tab="mesas">Mesas</button>
+                <button class="tab-btn" data-tab="delivery">Delivery</button>
+            </div>
+            
+            <div class="tab-content active" id="mesas">
+                <h2>Selecione sua Mesa</h2>
+                <div class="mesas-grid">
+                    <!-- Mesas de 1 a 10 -->
+                    <div class="mesa-card" data-mesa="1">
+                        <div class="mesa-number">Mesa 1</div>
+                        <div class="mesa-status disponivel"></div>
+                    </div>
+                    <!-- Repetir para mesas 2-10 -->
+                </div>
+            </div>
+            
+            <div class="tab-content" id="delivery">
+                <h2>Informações para Delivery</h2>
+                <form class="delivery-form">
+                    <div class="form-group">
+                        <label for="nome">Nome Completo</label>
+                        <input type="text" id="nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefone">Telefone</label>
+                        <input type="tel" id="telefone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="endereco">Endereço</label>
+                        <input type="text" id="endereco" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="complemento">Complemento</label>
+                        <input type="text" id="complemento">
+                    </div>
+                    <div class="form-group">
+                        <label for="pagamento">Forma de Pagamento</label>
+                        <select id="pagamento" required>
+                            <option value="">Selecione</option>
+                            <option value="dinheiro">Dinheiro</option>
+                            <option value="cartao">Cartão</option>
+                            <option value="pix">PIX</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="troco">Troco para (se for dinheiro)</label>
+                        <input type="text" id="troco" placeholder="R$ 0,00">
+                    </div>
+                    <div class="form-group">
+                        <label for="observacoes">Observações</label>
+                        <textarea id="observacoes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="pedido-actions">
+                <button class="btn btn-voltar">Voltar ao Cardápio</button>
+                <button class="btn btn-continuar">Continuar</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mesmo footer do index.html -->
+    <!-- Mesmos scripts do index.html -->
+    <script src="assets/js/pedidos.js"></script>
+</body>
+</html>

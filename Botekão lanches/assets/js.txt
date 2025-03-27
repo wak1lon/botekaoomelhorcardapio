@@ -1,0 +1,312 @@
+// DOM Ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all scripts
+    initTabs();
+    initCart();
+    initSlider();
+    
+    // GA4 Event Tracking
+    document.querySelectorAll('.btn-add').forEach(button => {
+        button.addEventListener('click', function() {
+            gtag('event', 'add_to_cart', {
+                'event_category': 'engagement',
+                'event_label': this.dataset.product
+            });
+            
+            fbq('track', 'AddToCart', {
+                content_ids: [this.dataset.product],
+                content_type: 'product'
+            });
+        });
+    });
+    
+    // Checkout button
+    document.querySelector('.btn-checkout')?.addEventListener('click', function() {
+        window.location.href = 'checkout.html';
+    });
+    
+    // Gerencia login
+    const gerenciaBtn = document.createElement('a');
+    gerenciaBtn.href = 'gerencia.html';
+    gerenciaBtn.className = 'gerencia-btn';
+    gerenciaBtn.innerHTML = '<i class="fas fa-lock"></i> Gerência';
+    document.body.appendChild(gerenciaBtn);
+    
+    // Style for gerencia button
+    const style = document.createElement('style');
+    style.textContent = `
+        .gerencia-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background-color: var(--dark-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .gerencia-btn:hover {
+            background-color: #222;
+            transform: translateY(-3px);
+        }
+        @media (max-width: 768px) {
+            .gerencia-btn {
+                bottom: 90px;
+                left: 20px;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+});
+
+// Tabs functionality
+function initTabs() {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const productCategories = document.querySelectorAll('.product-category');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons and categories
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            productCategories.forEach(cat => cat.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Show corresponding category
+            const categoryId = this.dataset.category;
+            document.getElementById(categoryId).classList.add('active');
+        });
+    });
+}
+
+// Slider functionality
+function initSlider() {
+    const slides = document.querySelectorAll('.banner-slide');
+    const dots = document.querySelectorAll('.dot');
+    let currentSlide = 0;
+    
+    function showSlide(n) {
+        slides.forEach(slide => slide.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+        
+        currentSlide = (n + slides.length) % slides.length;
+        slides[currentSlide].classList.add('active');
+        dots[currentSlide].classList.add('active');
+    }
+    
+    function nextSlide() {
+        showSlide(currentSlide + 1);
+    }
+    
+    // Auto slide change
+    let slideInterval = setInterval(nextSlide, 5000);
+    
+    // Pause on hover
+    const slider = document.querySelector('.banner-slider');
+    slider.addEventListener('mouseenter', () => clearInterval(slideInterval));
+    slider.addEventListener('mouseleave', () => slideInterval = setInterval(nextSlide, 5000));
+    
+    // Dot navigation
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            clearInterval(slideInterval);
+            showSlide(index);
+            slideInterval = setInterval(nextSlide, 5000);
+        });
+    });
+}
+
+// Cart functionality
+function initCart() {
+    const cartBtn = document.querySelector('.cart-btn');
+    const cartOverlay = document.querySelector('.cart-overlay');
+    const closeCart = document.querySelector('.close-cart');
+    const cartItemsContainer = document.querySelector('.cart-items');
+    const cartTotal = document.querySelector('.cart-total span');
+    const cartCount = document.querySelector('.cart-items-count');
+    const clearCartBtn = document.querySelector('.btn-clear');
+    
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    
+    // Toggle cart
+    cartBtn.addEventListener('click', () => {
+        cartOverlay.classList.add('active');
+    });
+    
+    closeCart.addEventListener('click', () => {
+        cartOverlay.classList.remove('active');
+    });
+    
+    // Add to cart
+    document.querySelectorAll('.btn-add').forEach(button => {
+        button.addEventListener('click', function() {
+            const productCard = this.closest('.product-card');
+            const productId = this.dataset.product;
+            const productName = productCard.querySelector('.product-name').textContent;
+            const productPrice = parseFloat(productCard.querySelector('.product-price').textContent.replace('R$ ', '').replace(',', '.'));
+            const productImage = productCard.querySelector('.product-image img').src;
+            
+            // Get selected options
+            const options = productCard.querySelectorAll('.product-options input[type="checkbox"]:checked');
+            let additionalPrice = 0;
+            let additionalText = '';
+            
+            options.forEach(option => {
+                additionalPrice += parseFloat(option.value);
+                additionalText += ` + ${option.parentNode.textContent.trim()}`;
+            });
+            
+            const totalPrice = productPrice + additionalPrice;
+            
+            // Check if product already in cart
+            const existingItem = cart.find(item => item.id === productId && item.options === additionalText);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: productId,
+                    name: productName,
+                    price: totalPrice,
+                    image: productImage,
+                    options: additionalText,
+                    quantity: 1
+                });
+            }
+            
+            updateCart();
+            showAddedToCartNotification(productName);
+        });
+    });
+    
+    // Clear cart
+    clearCartBtn?.addEventListener('click', () => {
+        cart = [];
+        updateCart();
+    });
+    
+    // Update cart UI
+    function updateCart() {
+        // Save to localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+        
+        // Update cart count
+        const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+        cartCount.textContent = totalItems;
+        
+        // Update cart items
+        cartItemsContainer.innerHTML = '';
+        
+        if (cart.length === 0) {
+            cartItemsContainer.innerHTML = '<p class="empty-cart">Seu carrinho está vazio</p>';
+            cartTotal.textContent = 'R$ 0,00';
+            return;
+        }
+        
+        let total = 0;
+        
+        cart.forEach(item => {
+            total += item.price * item.quantity;
+            
+            const cartItem = document.createElement('div');
+            cartItem.className = 'cart-item';
+            cartItem.innerHTML = `
+                <img src="${item.image}" alt="${item.name}" class="cart-item-img">
+                <div class="cart-item-info">
+                    <h4 class="cart-item-name">${item.name}${item.options}</h4>
+                    <p class="cart-item-price">R$ ${item.price.toFixed(2).replace('.', ',')}</p>
+                </div>
+                <div class="cart-item-quantity">
+                    <button class="decrease">-</button>
+                    <span>${item.quantity}</span>
+                    <button class="increase">+</button>
+                </div>
+                <i class="fas fa-trash cart-item-remove"></i>
+            `;
+            
+            cartItemsContainer.appendChild(cartItem);
+            
+            // Add event listeners to quantity buttons
+            const decreaseBtn = cartItem.querySelector('.decrease');
+            const increaseBtn = cartItem.querySelector('.increase');
+            const removeBtn = cartItem.querySelector('.cart-item-remove');
+            
+            decreaseBtn.addEventListener('click', () => {
+                if (item.quantity > 1) {
+                    item.quantity -= 1;
+                    updateCart();
+                }
+            });
+            
+            increaseBtn.addEventListener('click', () => {
+                item.quantity += 1;
+                updateCart();
+            });
+            
+            removeBtn.addEventListener('click', () => {
+                cart = cart.filter(cartItem => !(cartItem.id === item.id && cartItem.options === item.options));
+                updateCart();
+            });
+        });
+        
+        cartTotal.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+    }
+    
+    // Show notification when item added to cart
+    function showAddedToCartNotification(productName) {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.innerHTML = `
+            <i class="fas fa-check-circle"></i>
+            <span>${productName} adicionado ao carrinho!</span>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 10);
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 3000);
+        
+        // Add styles for notification
+        const style = document.createElement('style');
+        style.textContent = `
+            .notification {
+                position: fixed;
+                bottom: 100px;
+                right: 30px;
+                background-color: var(--success-color);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+                transform: translateX(150%);
+                transition: transform 0.3s ease;
+                z-index: 10000;
+            }
+            .notification.show {
+                transform: translateX(0);
+            }
+            .notification i {
+                font-size: 1.2rem;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // Initialize cart on page load
+    updateCart();
+}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!-- Mesmo head do index.html -->
+</head>
+<body>
+    <header class="header">
+        <!-- Mesmo header do index.html -->
+    </header>
+
+    <main class="checkout-container">
+        <div class="container">
+            <div class="checkout-steps">
+                <div class="step active">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Pedido</div>
+                </div>
+                <div class="step active">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Pagamento</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Confirmação</div>
+                </div>
+            </div>
+            
+            <div class="checkout-content">
+                <div class="resumo-pedido">
+                    <h2>Resumo do Pedido</h2>
+                    <div class="resumo-items">
+                        <!-- Itens serão preenchidos via JavaScript -->
+                    </div>
+                    <div class="resumo-total">
+                        <p>Total: <span>R$ 0,00</span></p>
+                    </div>
+                </div>
+                
+                <div class="metodos-pagamento">
+                    <h2>Método de Pagamento</h2>
+                    <div class="pagamento-options">
+                        <div class="pagamento-option">
+                            <input type="radio" name="pagamento" id="pix" value="pix" checked>
+                            <label for="pix">
+                                <i class="fab fa-pix"></i>
+                                <span>PIX</span>
+                            </label>
+                        </div>
+                        <div class="pagamento-option">
+                            <input type="radio" name="pagamento" id="cartao" value="cartao">
+                            <label for="cartao">
+                                <i class="far fa-credit-card"></i>
+                                <span>Cartão</span>
+                            </label>
+                        </div>
+                        <div class="pagamento-option">
+                            <input type="radio" name="pagamento" id="dinheiro" value="dinheiro">
+                            <label for="dinheiro">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span>Dinheiro</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="pagamento-details">
+                        <!-- Detalhes do pagamento serão exibidos conforme seleção -->
+                        <div id="pix-details" class="payment-detail active">
+                            <p>Escaneie o QR Code abaixo para pagar via PIX</p>
+                            <img src="assets/img/qrcode-pix.png" alt="QR Code PIX" class="qrcode">
+                            <p>Ou copie o código:</p>
+                            <div class="pix-code">
+                                <input type="text" value="00020126580014BR.GOV.BCB.PIX0136123e4567-e12b-12d1-a456-426655440000520400005303986540510.005802BR5913BotekaoLanches6009Medianeira62070503***6304A2A8" readonly>
+                                <button class="btn btn-copy">Copiar</button>
+                            </div>
+                        </div>
+                        
+                        <div id="cartao-details" class="payment-detail">
+                            <form class="cartao-form">
+                                <div class="form-group">
+                                    <label for="numero-cartao">Número do Cartão</label>
+                                    <input type="text" id="numero-cartao" placeholder="1234 5678 9012 3456">
+                                </div>
+                                <div class="form-group">
+                                    <label for="nome-cartao">Nome no Cartão</label>
+                                    <input type="text" id="nome-cartao" placeholder="Nome como no cartão">
+                                </div>
+                                <div class="form-group-row">
+                                    <div class="form-group">
+                                        <label for="validade">Validade</label>
+                                        <input type="text" id="validade" placeholder="MM/AA">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cvv">CVV</label>
+                                        <input type="text" id="cvv" placeholder="123">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div id="dinheiro-details" class="payment-detail">
+                            <div class="form-group">
+                                <label for="troco-para">Troco para</label>
+                                <input type="text" id="troco-para" placeholder="R$ 0,00">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checkout-actions">
+                <button class="btn btn-voltar">Voltar</button>
+                <button class="btn btn-confirmar">Confirmar Pedido</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mesmo footer do index.html -->
+    <!-- Mesmos scripts do index.html -->
+    <script src="assets/js/checkout.js"></script>
+</body>
+</html>
